@@ -10,6 +10,7 @@ const PORT = process.env.PORT;
 process.env.TZ = "Asia/Jakarta";
 
 app.use(morgan('dev'));
+app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(cors({
     origin: "*",
@@ -37,4 +38,4 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Serving port ${PORT}`));
+module.exports = app;
