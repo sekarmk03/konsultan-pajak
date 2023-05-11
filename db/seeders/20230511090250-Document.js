@@ -14,7 +14,7 @@ module.exports = {
     */
    await queryInterface.bulkInsert('Documents', [
     {
-      filename: 'sample.pdf',
+      file_name: 'sample.pdf',
       imagekit_id: 'sample-pdf',
       imagekit_url: 'https://ik.imagekit.io/sekarmadu/konsultan_pajak/sample.pdf',
       imagekit_path: '/konsultan_pajak/sample.pdf',

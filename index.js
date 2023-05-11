@@ -6,7 +6,7 @@ const cors = require('cors');
 const router = require('./routes/index');
 
 const app = express();
-const PORT = process.env.PORT;
+const API_BASE_PATH = process.env.API_BASE_PATH;
 process.env.TZ = "Asia/Jakarta";
 
 app.use(morgan('dev'));
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // err handler
-app.use('/api/v1', router);
+app.use(API_BASE_PATH, router);
 
 app.use((req, res, next) => {
     return res.status(404).json({

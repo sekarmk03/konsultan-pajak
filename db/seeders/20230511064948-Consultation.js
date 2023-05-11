@@ -17,8 +17,8 @@ module.exports = {
     {
       schedule_id: 3,
       admin_id: 1,
-      date_start: "0000-00-00 00:00:00",
-      date_end: "0000-00-00 00:00:00",
+      date_start: null,
+      date_end: null,
       doc_id: 1,
       status: status.NOT_STARTED,
       cost: 1000000,

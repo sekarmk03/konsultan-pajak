@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       imagekit_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       imagekit_url: {
         type: Sequelize.STRING
