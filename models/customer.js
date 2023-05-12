@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Customer.init({
+    user_id: DataTypes.INTEGER,
     img_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     npwp: DataTypes.STRING,
