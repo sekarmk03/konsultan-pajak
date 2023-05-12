@@ -15,7 +15,7 @@ module.exports = {
     */
    await queryInterface.bulkInsert('Customers', [
     {
-      img_id: 3,
+      user_id: 3,
       name: "Sekar Madu",
       npwp: "08.178.554.2-123.321",
       address: "Gegerkalong Girang, Sukasari, Bandung",
@@ -29,7 +29,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
-      img_id: 4,
+      user_id: 4,
       name: "Kusumawardani",
       npwp: "08.178.554.2-123.432",
       address: "Setiabudi, Bandung",
@@ -43,7 +43,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
-      img_id: 5,
+      user_id: 5,
       name: "Muhammad Azar Nuzy",
       npwp: "09.178.554.2-123.432",
       address: "Sukajadi, Kota Bandung, Jawa Barat",

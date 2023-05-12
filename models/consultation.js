@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Consultation.belongsTo(models.Schedule, {foreignKey: 'schedule_id', as: 'schedule'});
+      Consultation.belongsTo(models.Admin, {foreignKey: 'admin_id', as: 'admin'});
     }
   }
   Consultation.init({
@@ -18,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
     admin_id: DataTypes.INTEGER,
     date_start: DataTypes.DATE,
     date_end: DataTypes.DATE,
-    doc_id: DataTypes.INTEGER,
     status: DataTypes.STRING,
     cost: DataTypes.INTEGER
   }, {

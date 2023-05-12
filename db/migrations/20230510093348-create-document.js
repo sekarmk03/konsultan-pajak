@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      consultation_id: {
+        type: Sequelize.INTEGER
+      },
       file_name: {
         type: Sequelize.STRING
       },
