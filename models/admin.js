@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Admin.belongsTo(models.User, {foreignKey: 'user_id', as: 'user'});
       Admin.hasMany(models.Consultation, {foreignKey: 'admin_id', as: 'consultations'});
+      Admin.hasMany(models.Notification, {foreignKey: 'sender_id', as: 'notifications'});
     }
   }
   Admin.init({

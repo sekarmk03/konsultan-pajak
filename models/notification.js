@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Notification.belongsTo(models.Customer, {foreignKey: 'receiver_id', as: 'receiver'});
+      Notification.belongsTo(models.Admin, {foreignKey: 'sender_id', as: 'sender'});
     }
   }
   Notification.init({

@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ConsultType.hasMany(models.Schedule, {foreignKey: 'type_id', as: 'schedules'});
     }
   }
   ConsultType.init({
