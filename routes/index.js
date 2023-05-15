@@ -4,9 +4,11 @@ const router = express.Router();
 const auth = require('./auth');
 const user = require('./user');
 const customer = require('./customer');
+const admin = require('./admin');
 
 router.use('/auth', auth);
 router.use('/users', user);
 router.use('/customers', customer);
+router.use('/admins', admin);
 
 module.exports = router;

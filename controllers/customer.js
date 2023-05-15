@@ -162,7 +162,7 @@ module.exports = {
 
             return res.status(201).json(response);
         } catch (err) {
-            nest(err);
+            next(err);
         }
     },
 
@@ -175,7 +175,7 @@ module.exports = {
             const val = v.validate(body, schema.customer.update);
             if (val.length) return res.status(400).json(val);
 
-            const customer = await Customer.findOne({where: id});
+            const customer = await Customer.findOne({where: {id}});
             if (!customer) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
