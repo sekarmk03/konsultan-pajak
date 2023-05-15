@@ -103,7 +103,7 @@ module.exports = {
             if (!user) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `Book Didn't Exist`,
+                    message: `User didn't exist`,
                     data: null
                 });
             }
@@ -125,7 +125,7 @@ module.exports = {
 
             return res.status(200).json(response);
         } catch (err) {
-            next(err)
+            next(err);
         }
     },
 
@@ -239,7 +239,7 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const user = await User.findOne({ where: {id} })
+            const user = await User.findOne({ where: {id} });
 
             if (!user) {
                 return res.status(404).json({
