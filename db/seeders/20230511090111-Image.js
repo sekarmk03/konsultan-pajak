@@ -14,7 +14,6 @@ module.exports = {
     */
    await queryInterface.bulkInsert('Images', [
     {
-      user_id: 0,
       file_name: 'default.png',
       imagekit_id: 'default-image',
       imagekit_url: 'https://ik.imagekit.io/sekarmk03/default.png',

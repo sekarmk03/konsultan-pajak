@@ -14,13 +14,14 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.Role, {foreignKey: 'role_id', as: 'role'});
       User.hasOne(models.Admin, {foreignKey: 'user_id', as: 'cust_detail'});
       User.hasOne(models.Customer, {foreignKey: 'user_id', as: 'adm_detail'});
-      User.hasMany(models.Image, {foreignKey: 'user_id', as: 'images'});
+      User.belongsTo(models.Image, {foreignKey: 'img_id', as: 'image'});
     }
   }
   User.init({
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     role_id: DataTypes.INTEGER,
+    img_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'User',

@@ -11,11 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Image.belongsTo(models.User, {foreignKey: 'user_id', as: 'user'});
+      Image.hasOne(models.User, {foreignKey: 'img_id', as: 'user'});
     }
   }
   Image.init({
-    user_id: DataTypes.INTEGER,
     file_name: DataTypes.STRING,
     imagekit_id: DataTypes.STRING,
     imagekit_url: DataTypes.STRING,

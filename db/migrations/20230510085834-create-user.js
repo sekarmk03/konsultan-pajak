@@ -9,9 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      img_id: {
-        type: Sequelize.INTEGER
-      },
       email: {
         type: Sequelize.STRING
       },
@@ -19,6 +16,9 @@ module.exports = {
         type: Sequelize.STRING
       },
       role_id: {
+        type: Sequelize.INTEGER
+      },
+      img_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {

@@ -19,6 +19,7 @@ module.exports = {
       email: "sekarmadu99@gmail.com",
       password: await bcrypt.hash('secret123', 10),
       role_id: roles.SUPERADMIN,
+      img_id: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -26,6 +27,7 @@ module.exports = {
       email: "sekarmadu@upi.edu",
       password: await bcrypt.hash('secret123', 10),
       role_id: roles.ADMIN,
+      img_id: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -33,6 +35,7 @@ module.exports = {
       email: "sekarmadukusumawardani@gmail.com",
       password: await bcrypt.hash('secret123', 10),
       role_id: roles.CUSTOMER,
+      img_id: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -40,6 +43,7 @@ module.exports = {
       email: "sekar.kusumawardani@digits.id",
       password: await bcrypt.hash('secret123', 10),
       role_id: roles.CUSTOMER,
+      img_id: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -47,6 +51,7 @@ module.exports = {
       email: "azarnuzy@gmail.com",
       password: await bcrypt.hash('secret123', 10),
       role_id: roles.CUSTOMER,
+      img_id: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },

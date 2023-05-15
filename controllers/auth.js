@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const roles = require('../common/constant/roles');
-const { User, Notification } = require('../models');
+const { User, Notification, Image } = require('../models');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
 const v = new Validator;
@@ -13,7 +13,7 @@ const {
 module.exports = {
     register: async (req, res, next) => {
         try {
-            const { email, password, role_id = roles.CUSTOMER, user_detail_id = 0 } = req.body;
+            const { email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
 
             const exist = await User.findOne({where: {email: email}});
 
@@ -26,7 +26,7 @@ module.exports = {
             }
 
             const body = req.body;
-            const val = v.validate(body, schema.auth.register);
+            const val = v.validate(body, schema.user.register);
             if (val.length) return res.status(400).json(val);
 
             const hashedPass = await bcrypt.hash(password, 10);
@@ -34,7 +34,7 @@ module.exports = {
                 email,
                 password: hashedPass,
                 role_id,
-                user_detail_id
+                img_id
             });
 
             await Notification.create({
@@ -58,7 +58,7 @@ module.exports = {
                     email: newUser.email,
                     password: newUser.password,
                     role_id: newUser.role_id,
-                    user_detail_id: newUser.user_detail_id
+                    img_id: newUser.img_id
                 }
             });
         } catch (err) {
@@ -69,7 +69,14 @@ module.exports = {
     login: async (req, res, next) => {
         try {
             const { email, password } = req.body;
-            const user = await User.findOne({where: {email: email}});
+            const user = await User.findOne({
+                where: {email: email},
+                include: {
+                    model: Image,
+                    as: 'image',
+                    attributes: ['file_name', 'imagekit_url']
+                }
+            });
 
             if (!user) {
                 return res.status(404).json({
@@ -93,7 +100,6 @@ module.exports = {
                 email: user.email,
                 password: user.password,
                 role_id: user.role_id,
-                user_detail_id: user.user_detail_id
             };
 
             const token = jwt.sign(payload, JWT_SECRET_KEY);
@@ -109,6 +115,7 @@ module.exports = {
                     id: user.id,
                     email: user.email,
                     token: token,
+                    image: user.image
                 }
             });
         } catch (err) {
@@ -130,9 +137,10 @@ module.exports = {
                 data: {
                     id: currentUser.id,
                     email: currentUser.email,
-                    token: currentUser.token,
+                    role_id: currentUser.role_id,
+                    img_id: currentUser.img_id,
                 }
-            })
+            });
         } catch (err) {
             next(err);
         }
