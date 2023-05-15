@@ -13,7 +13,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "name", type = "ASC", search = "", page = "1", limit = "10"
+                sort = "email", type = "ASC", search = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);
@@ -26,7 +26,7 @@ module.exports = {
                     [sort, type]
                 ],
                 where: {
-                    name: {
+                    email: {
                         [Op.iLike]: `%${search}%`
                     }
                 },
@@ -58,9 +58,10 @@ module.exports = {
             const userResources = users.rows.map((user) => {
                 const uRes = halson(user.toJSON())
                 .addLink('self', `${API_BASE_PATH}/users/${user.id}`)
-                .addLink('role', `${API_BASE_PATH}/roles/${user.role_id}`);
+                .addLink('role', `${API_BASE_PATH}/roles/${user.role_id}`)
+                .addLink('image', `${API_BASE_PATH}/images/${user.img_id}`);
 
-                return userResources;
+                return uRes;
             })
 
             const response = {
@@ -69,8 +70,8 @@ module.exports = {
                 pagination,
                 data: userResources,
                 links: {
-                    self: req.originalUrl,
-                    collection: `${API_BASE_PATH}/users`
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/users`}
                 }
             }
             
@@ -109,15 +110,16 @@ module.exports = {
 
             const userResource = halson(user.toJSON())
             .addLink('self', `${API_BASE_PATH}/users/${user.id}`)
-            .addLink('role', `${API_BASE_PATH}/users/${user.role_id}`);
+            .addLink('role', `${API_BASE_PATH}/roles/${user.role_id}`)
+            .addLink('image', `${API_BASE_PATH}/images/${user.img_id}`);
 
             const response = {
                 status: 'OK',
                 message: 'Get user success',
                 data: userResource,
                 links: {
-                    self: req.originalUrl,
-                    collection: `${API_BASE_PATH}/users`
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/users` }
                 }
             };
 
@@ -162,9 +164,9 @@ module.exports = {
                 message: 'New user created',
                 data: userResource,
                 links: {
-                    self: req.originalUrl,
-                    collection: `${API_BASE_PATH}/users`,
-                    created: `${API_BASE_PATH}/users/${created.id}`
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/users` },
+                    created: { href: `${API_BASE_PATH}/users/${created.id}` }
                 }
             };
 
@@ -180,7 +182,7 @@ module.exports = {
             let { email, role_id, img_id } = req.body;
 
             const body = req.body;
-            const val = v.validate(body, schema.user.register);
+            const val = v.validate(body, schema.user.update);
             if (val.length) return res.status(400).json(val);
 
             const user = await User.findOne({ where: { id } });
@@ -188,6 +190,16 @@ module.exports = {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
                     message: `User didn't exist`,
+                    data: null
+                });
+            }
+
+            const userEmail = await User.findOne({where: {email}});
+
+            if (userEmail) {
+                return res.status(409).json({
+                    status: 'CONFLICT',
+                    message: 'Email already used',
                     data: null
                 });
             }
@@ -211,9 +223,9 @@ module.exports = {
                 message: 'Update user success',
                 data: userResource,
                 links: {
-                    self: req.originalUrl,
-                    collection: `${API_BASE_PATH}/users`,
-                    updated: `${API_BASE_PATH}/users/${user.id}`
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/users` },
+                    updated: { href: `${API_BASE_PATH}/users/${user.id}` }
                 }
             }
 
@@ -244,9 +256,9 @@ module.exports = {
                 message: 'Delete user success',
                 data: null,
                 links: {
-                    self: req.originalUrl,
-                    collection: `${API_BASE_PATH}/users`,
-                    deleted: `${API_BASE_PATH}/users/${user.id}`
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/users` },
+                    deleted: { href: `${API_BASE_PATH}/users/${user.id}` }
                 }
             };
 
