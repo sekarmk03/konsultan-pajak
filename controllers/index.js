@@ -5,6 +5,7 @@ const admin = require('./admin');
 const image = require('./image');
 const role = require('./role');
 const document = require('./document');
+const schedule = require('./schedule');
 
 module.exports = {
     auth,
@@ -13,5 +14,6 @@ module.exports = {
     admin,
     image,
     role,
-    document
+    document,
+    schedule
 };
