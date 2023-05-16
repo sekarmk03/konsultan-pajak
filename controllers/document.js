@@ -1,4 +1,4 @@
-const { Image } = require('../models');
+const { Document } = require('../models');
 const { Op } = require('sequelize');
 const halson = require('halson');
 const imagekit = require('../utils/imagekit');
@@ -19,7 +19,7 @@ module.exports = {
             let start = 0 + (page - 1) * limit;
             let end = page * limit;
 
-            const images = await Image.findAndCountAll({
+            const documents = await Document.findAndCountAll({
                 order: [
                     [sort, type]
                 ],
@@ -32,30 +32,31 @@ module.exports = {
                 offset: start
             });
 
-            let count = images.count;
+            let count = documents.count;
             let pagination = {};
             pagination.totalRows = count;
             pagination.totalPages = Math.ceil(count/limit);
-            pagination.thisPageRows = images.rows.length;
+            pagination.thisPageRows = documents.rows.length;
             pagination.currentPage = page;
             pagination.next = end < count ? page + 1 : null;
             pagination.prev = start > 0 ? page - 1 : null;
 
-            const imgResources = images.rows.map((img) => {
-                const resource = halson(img.toJSON())
-                .addLink('self', `${API_BASE_PATH}/images/${img.id}`);
+            const docResources = documents.rows.map((doc) => {
+                const resource = halson(doc.toJSON())
+                .addLink('self', `${API_BASE_PATH}/documents/${doc.id}`)
+                .addLink('consultation', `${API_BASE_PATH}/consultations/${doc.consultation_id}`);
 
                 return resource;
             });
 
             const response = {
                 status: 'OK',
-                message: 'Get all images success',
+                message: 'Get all documents success',
                 pagination,
-                data: imgResources,
+                data: docResources,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/images` }
+                    collection: { href: `${API_BASE_PATH}/documents` }
                 }
             }
 
@@ -68,28 +69,29 @@ module.exports = {
     show: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const image = await Image.findOne({
+            const document = await Document.findOne({
                 where: {id}
             });
 
-            if (!image) {
+            if (!document) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `Image didn't exist`,
+                    message: `Document didn't exist`,
                     data: null
                 });
             }
 
-            const imgResource = halson(image.toJSON())
-            .addLink('self', `${API_BASE_PATH}/images/${image.id}`);
+            const docResource = halson(document.toJSON())
+            .addLink('self', `${API_BASE_PATH}/documents/${document.id}`)
+            .addLink('consultation', `${API_BASE_PATH}/consultations/${document.consultation_id}`);
 
             const response = {
                 status: 'OK',
-                message: 'Get image success',
-                data: imgResource,
+                message: 'Get document success',
+                data: docResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/images` }
+                    collection: { href: `${API_BASE_PATH}/documents` }
                 }
             };
 
@@ -101,32 +103,36 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const image = req.file.buffer.toString('base64');
+            let { consultation_id } = req.body;
+            consultation_id = parseInt(consultation_id);
+            const document = req.file.buffer.toString('base64');
 
             const uploadImg = await imagekit.upload({
-                file: image,
+                file: document,
                 fileName: req.file.originalname,
                 folder: IMAGEKIT_FOLDER
             });
 
-            const created = await Image.create({
+            const created = await Document.create({
+                consultation_id,
                 file_name: uploadImg.name,
                 imagekit_id: uploadImg.fileId,
                 imagekit_url: uploadImg.url,
                 imagekit_path: uploadImg.filePath
             });
 
-            const imgResource = halson(created.toJSON())
-            .addLink('self', `${API_BASE_PATH}/images/${created.id}`);
+            const docResource = halson(created.toJSON())
+            .addLink('self', `${API_BASE_PATH}/documents/${created.id}`)
+            .addLink('consultation', `${API_BASE_PATH}/consultations/${created.consultation_id}`);
 
             const response = {
                 status: 'CREATED',
-                message: 'New image created',
-                data: imgResource,
+                message: 'New document created',
+                data: docResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/images`},
-                    created: { href: `${API_BASE_PATH}/images/${created.id}`}
+                    collection: { href: `${API_BASE_PATH}/documents`},
+                    created: { href: `${API_BASE_PATH}/documents/${created.id}`}
                 }
             };
 
@@ -139,45 +145,46 @@ module.exports = {
     update: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const image = req.file.buffer.toString('base64');
+            const document = req.file.buffer.toString('base64');
 
-            const imgData = await Image.findOne({where: {id}});
-            if (!imgData) {
+            const docData = await Document.findOne({where: {id}});
+            if (!docData) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `Image didn't exist`,
+                    message: `Document didn't exist`,
                     data: null
                 });
             }
 
-            if (imgData.imagekit_id != 'default-image') {
-                await imagekit.deleteFile(imgData.imagekit_id);
+            if (docData.imagekit_id != 'sample-pdf') {
+                await imagekit.deleteFile(docData.imagekit_id);
             }
 
             const uploadNew = await imagekit.upload({
-                file: image,
+                file: document,
                 fileName: req.file.originalname,
                 folder: IMAGEKIT_FOLDER
             });
 
-            await imgData.update({
+            await docData.update({
                 file_name: uploadNew.name,
                 imagekit_id: uploadNew.fileId,
                 imagekit_url: uploadNew.url,
                 imagekit_path: uploadNew.filePath
             });
 
-            const imgResource = halson(imgData.toJSON())
-            .addLink('self', `${API_BASE_PATH}/images/${imgData.id}`);
+            const docResource = halson(docData.toJSON())
+            .addLink('self', `${API_BASE_PATH}/documents/${docData.id}`)
+            .addLink('consultation', `${API_BASE_PATH}/consultations/${docData.consultation_id}`);
 
             const response = {
                 status: 'OK',
-                message: 'Update image success',
-                data: imgResource,
+                message: 'Update document success',
+                data: docResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/images` },
-                    updated: { href: `${API_BASE_PATH}/images/${image.id}` }
+                    collection: { href: `${API_BASE_PATH}/documents` },
+                    updated: { href: `${API_BASE_PATH}/documents/${document.id}` }
                 }
             };
 
@@ -191,30 +198,30 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const image = await Image.findOne({ where: {id} });
+            const document = await Document.findOne({ where: {id} });
 
-            if (!image) {
+            if (!document) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `Image didn't exist`,
+                    message: `Document didn't exist`,
                     data: null
                 });
             }
 
-            if (image.imagekit_id != 'default-image') {
-                await imagekit.deleteFile(image.imagekit_id);
+            if (document.imagekit_id != 'sample-pdf') {
+                await imagekit.deleteFile(document.imagekit_id);
             }
 
-            await image.destroy();
+            await document.destroy();
 
             const response = {
                 status: 'OK',
-                message: 'Delete image success',
+                message: 'Delete document success',
                 data: null,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/images` },
-                    deleted: { href: `${API_BASE_PATH}/images/${image.id}` }
+                    collection: { href: `${API_BASE_PATH}/documents` },
+                    deleted: { href: `${API_BASE_PATH}/documents/${document.id}` }
                 }
             };
 
