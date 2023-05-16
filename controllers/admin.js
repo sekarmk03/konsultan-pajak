@@ -49,11 +49,11 @@ module.exports = {
             pagination.prev = start > 0 ? page - 1 : null;
 
             const admResources = admins.rows.map((adm) => {
-                const cRes = halson(adm.toJSON())
+                const resource = halson(adm.toJSON())
                 .addLink('self', `${API_BASE_PATH}/admins/${adm.id}`)
                 .addLink('user', `${API_BASE_PATH}/users/${adm.user_id}`);
 
-                return cRes;
+                return resource;
             });
 
             const response = {
