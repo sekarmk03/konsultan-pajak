@@ -139,7 +139,7 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { cust_id, type_id, place_type, address, gmap_link } = req.body;
+            const { cust_id, type_id, date, place_type, address, gmap_link } = req.body;
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.create);
@@ -148,7 +148,7 @@ module.exports = {
             const created = await Schedule.create({
                 cust_id,
                 type_id,
-                date: new Date(),
+                date,
                 place_type,
                 address,
                 gmap_link,
@@ -182,7 +182,7 @@ module.exports = {
     update: async (req, res, next) => {
         try {
             const { id } = req.params;
-            let { type_id, place_type, address, gmap_link } = req.body;
+            let { type_id, date, place_type, address, gmap_link } = req.body;
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.update);
@@ -198,12 +198,14 @@ module.exports = {
             }
 
             if (!type_id) type_id = schedule.type_id;
+            if (!date) date = schedule.date;
             if (!place_type) place_type = schedule.place_type;
             if (!address) address = schedule.address;
             if (!gmap_link) gmap_link = schedule.gmap_link;
 
             await schedule.update({
                 type_id,
+                date,
                 place_type,
                 address,
                 gmap_link
