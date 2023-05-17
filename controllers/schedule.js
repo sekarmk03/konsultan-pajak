@@ -1,6 +1,7 @@
 const { Schedule, Consultation, ConsultType, Customer } = require('../models');
 const { Op } = require('sequelize');
 const state = require('../common/constant/status');
+const openHours = require('../common/constant/openHours');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
 const v = new Validator;
@@ -22,7 +23,7 @@ module.exports = {
             let end = page * limit;
 
             const now = new Date();
-            const startTime = new Date(`${date ? date : '2023-01-02'} 00:00:00`);
+            const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
             const endTime = new Date(date ? date + ' 23:59:59' : now);
 
             const schedules = await Schedule.findAndCountAll({
@@ -139,7 +140,20 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { cust_id, type_id, date, place_type, address, gmap_link } = req.body;
+            let { cust_id, type_id, date, place_type, address, gmap_link } = req.body;
+
+            const dateOnly = date.substring(0, 10);
+            const openTime = new Date(`${dateOnly}T${openHours.OPEN}`);
+            const closeTime = new Date(`${dateOnly}T${openHours.CLOSE}`);
+            date = new Date(date);
+
+            if (!((date > openTime) && (date < closeTime))) {
+                return res.status(400).json({
+                    status: 'BAD_REQUEST',
+                    message: `Time selected is outside open hours`,
+                    data: null
+                });
+            }
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.create);
@@ -183,6 +197,21 @@ module.exports = {
         try {
             const { id } = req.params;
             let { type_id, date, place_type, address, gmap_link } = req.body;
+
+            if (date) {
+                const dateOnly = date.substring(0, 10);
+                const openTime = new Date(`${dateOnly}T${openHours.OPEN}`);
+                const closeTime = new Date(`${dateOnly}T${openHours.CLOSE}`);
+                date = new Date(date);
+
+                if (!((date > openTime) && (date < closeTime))) {
+                    return res.status(400).json({
+                        status: 'BAD_REQUEST',
+                        message: `Time selected is outside open hours`,
+                        data: null
+                    });
+                }
+            }
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.update);
