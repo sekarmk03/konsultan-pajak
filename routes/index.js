@@ -9,6 +9,7 @@ const image = require('./image');
 const role = require('./role');
 const document = require('./document');
 const schedule = require('./schedule');
+const consultation = require('./consultation');
 
 router.use('/auth', auth);
 router.use('/users', user);
@@ -18,5 +19,6 @@ router.use('/images', image);
 router.use('/roles', role);
 router.use('/documents', document);
 router.use('/schedules', schedule);
+router.use('/consultations', consultation);
 
 module.exports = router;

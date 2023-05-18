@@ -6,6 +6,7 @@ const image = require('./image');
 const role = require('./role');
 const document = require('./document');
 const schedule = require('./schedule');
+const consultation = require('./consultation');
 
 module.exports = {
     auth,
@@ -15,5 +16,6 @@ module.exports = {
     image,
     role,
     document,
-    schedule
+    schedule,
+    consultation
 };
