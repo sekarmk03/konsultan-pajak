@@ -1,4 +1,4 @@
-const { Schedule, ConsultType, Customer } = require('../models');
+const { Schedule, ConsultType, Customer, Consultation } = require('../models');
 const { Op } = require('sequelize');
 const state = require('../common/constant/status');
 const openHours = require('../common/constant/openHours');
@@ -288,6 +288,130 @@ module.exports = {
                     self: { href: req.originalUrl },
                     collection: { href: `${API_BASE_PATH}/schedules` },
                     deleted: { href: `${API_BASE_PATH}/schedules/${schedule.id}` }
+                }
+            };
+
+            return res.status(200).json(response);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    accept: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const { admin_id, cost = 0 } = req.body;
+
+            const schedule = await Schedule.findOne({where: {id}});
+            if (!schedule) {
+                return res.status(404).json({
+                    status: 'NOT_FOUND',
+                    message: `Schedule didn't exist`,
+                    data: null
+                });
+            }
+
+            if (schedule.status != state.REQUESTED) {
+                let message = '';
+                switch (schedule.status) {
+                    case state.ACCEPTED:
+                        message = `Schedule already accepted`;
+                        break;
+                    case state.DECLINED:
+                        message = `Schedule already declined`;
+                        break;
+                    default:
+                        message = `Schedule already inserted to consultation`;
+                        break;
+                }
+                return res.status(400).json({
+                    status: 'BAD_REQUEST',
+                    message: message,
+                    data: null
+                });
+            }
+
+            await schedule.update({
+                status: state.ACCEPTED,
+            });
+
+            const created = await Consultation.create({
+                schedule_id: schedule.id,
+                admin_id,
+                date_start: null,
+                date_end: null,
+                status: state.NOT_STARTED,
+                cost
+            });
+
+            const schResource = halson(schedule.toJSON())
+            .addLink('self', `${API_BASE_PATH}/schedules/${schedule.id}`)
+            .addLink('customer', `${API_BASE_PATH}/customers/${schedule.cust_id}`)
+            .addLink('type', `${API_BASE_PATH}/consulttypes/${schedule.type_id}`)
+            .addLink('consultation', `${API_BASE_PATH}/consultations/${created.id}`);
+
+            const response = {
+                status: 'OK',
+                message: 'Accept schedule success',
+                data: schResource,
+                links: {
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/schedules` },
+                    updated: { href: `${API_BASE_PATH}/schedules/${schedule.id}` }
+                }
+            };
+
+            return res.status(200).json(response);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    decline: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+
+            const schedule = await Schedule.findOne({where: {id}});
+            if (!schedule) {
+                return res.status(404).json({
+                    status: 'NOT_FOUND',
+                    message: `Schedule didn't exist`,
+                    data: null
+                });
+            }
+
+            if (schedule.status != state.REQUESTED) {
+                let message = '';
+                switch (schedule.status) {
+                    case state.ACCEPTED:
+                        message = `Schedule already accepted`;
+                        break;
+                    case state.DECLINED:
+                        message = `Schedule already declined`;
+                        break;
+                    default:
+                        message = `Schedule already inserted to consultation`;
+                        break;
+                }
+                return res.status(400).json({
+                    status: 'BAD_REQUEST',
+                    message: message,
+                    data: null
+                });
+            }
+
+            await schedule.update({
+                status: state.DECLINED,
+            });
+
+            const response = {
+                status: 'OK',
+                message: 'Decline schedule success',
+                data: schedule,
+                links: {
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/schedules` },
+                    updated: { href: `${API_BASE_PATH}/schedules/${schedule.id}` }
                 }
             };
 

@@ -1,5 +1,4 @@
 const { Consultation, Schedule, Admin, Customer, ConsultType, Document } = require('../models');
-const { Op } = require('sequelize');
 const state = require('../common/constant/status');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
