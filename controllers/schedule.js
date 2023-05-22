@@ -1,4 +1,4 @@
-const { Schedule, ConsultType, Customer, Consultation } = require('../models');
+const { Schedule, ConsultType, Customer, Consultation, Notification } = require('../models');
 const { Op } = require('sequelize');
 const state = require('../common/constant/status');
 const openHours = require('../common/constant/openHours');
