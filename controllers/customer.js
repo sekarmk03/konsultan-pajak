@@ -1,4 +1,4 @@
-const { Customer, User } = require('../models');
+const { Customer, User, Schedule, Consultation, ConsultType } = require('../models');
 const { Op } = require('sequelize');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
@@ -52,7 +52,9 @@ module.exports = {
                 const cRes = halson(cust.toJSON())
                 .addLink('self', `${API_BASE_PATH}/customers/${cust.id}`)
                 .addLink('user', `${API_BASE_PATH}/users/${cust.user_id}`)
-                .addLink('consultation', `${API_BASE_PATH}/customers/${cust.id}/consultations`);
+                .addLink('consult-request', `${API_BASE_PATH}/customers/${cust.id}/requests`)
+                .addLink('consult-ongoing', `${API_BASE_PATH}/customers/${cust.id}/consultations?status=ongoing`)
+                .addLink('consult-done', `${API_BASE_PATH}/customers/${cust.id}/consultations?status=done`);
 
                 return cRes;
             });
@@ -98,7 +100,9 @@ module.exports = {
             const custResource = halson(customer.toJSON())
             .addLink('self', `${API_BASE_PATH}/customers/${customer.id}`)
             .addLink('user', `${API_BASE_PATH}/users/${customer.user_id}`)
-            .addLink('consultation', `${API_BASE_PATH}/customers/${customer.id}/consultations`);
+            .addLink('consult-request', `${API_BASE_PATH}/customers/${customer.id}/requests`)
+            .addLink('consult-ongoing', `${API_BASE_PATH}/customers/${customer.id}/consultations?status=ongoing`)
+            .addLink('consult-done', `${API_BASE_PATH}/customers/${customer.id}/consultations?status=done`);
 
             const response = {
                 status: 'OK',
@@ -273,6 +277,147 @@ module.exports = {
                     deleted: { href: `${API_BASE_PATH}/customers/${customer.id}` }
                 }
             };
+
+            return res.status(200).json(response);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    consultRequest: async (req, res, next) => {
+        try {
+            let {
+                sort = "createdAt", type = "DESC", date = "", page = "1", limit = "10"
+            } = req.query;
+            const { id } = req.params;
+
+            page = parseInt(page);
+            limit = parseInt(limit);
+            let start = 0 + (page - 1) * limit;
+            let end = page * limit;
+
+            const now = new Date();
+            const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
+            const endTime = new Date(date ? date + ' 23:59:59' : now);
+
+            const schedules = await Schedule.findAndCountAll({
+                order: [
+                    [sort, type]
+                ],
+                where: {
+                    cust_id: id,
+                    date: {
+                        [Op.between]: [startTime, endTime]
+                    },
+                },
+                include: [
+                    {
+                        model: ConsultType,
+                        as: 'type',
+                        attributes: ['type']
+                    },
+                    {
+                        model: Consultation,
+                        as: 'consultation',
+                        attributes: ['date_start', 'date_end', 'cost']
+                    }
+                ],
+                limit: limit,
+                offset: start
+            });
+
+            let count = schedules.count;
+            let pagination = {};
+            pagination.totalRows = count;
+            pagination.totalPages = Math.ceil(count/limit);
+            pagination.thisPageRows = schedules.rows.length;
+            pagination.currentPage = page;
+            pagination.next = end < count ? page + 1 : null;
+            pagination.prev = start > 0 ? page - 1 : null;
+
+            const response = {
+                status: 'OK',
+                message: `Get customer's consultation requests success`,
+                pagination,
+                data: schedules.rows,
+                links: {
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/schedules` }
+                }
+            }
+
+            return res.status(200).json(response);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    consultations: async (req, res, next) => {
+        try {
+            let {
+                sort = "createdAt", type = "DESC", date = "", page = "1", limit = "10", status = 'ongoing'
+            } = req.query;
+            const { id } = req.params;
+
+            page = parseInt(page);
+            limit = parseInt(limit);
+            let start = 0 + (page - 1) * limit;
+            let end = page * limit;
+
+            const now = new Date();
+            const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
+            const endTime = new Date(date ? date + ' 23:59:59' : now);
+
+            const schedules = await Schedule.findAndCountAll({
+                order: [
+                    [sort, type]
+                ],
+                where: {
+                    cust_id: id,
+                    date: {
+                        [Op.between]: [startTime, endTime]
+                    },
+                },
+                include: [
+                    {
+                        model: ConsultType,
+                        as: 'type',
+                        attributes: ['type']
+                    },
+                    {
+                        model: Consultation,
+                        as: 'consultation',
+                        where: {
+                            status: {
+                                [Op.iLike]: `%${status}%`
+                            }
+                        },
+                        attributes: ['id', 'date_start', 'date_end', 'cost']
+                    }
+                ],
+                limit: limit,
+                offset: start
+            });
+
+            let count = schedules.count;
+            let pagination = {};
+            pagination.totalRows = count;
+            pagination.totalPages = Math.ceil(count/limit);
+            pagination.thisPageRows = schedules.rows.length;
+            pagination.currentPage = page;
+            pagination.next = end < count ? page + 1 : null;
+            pagination.prev = start > 0 ? page - 1 : null;
+
+            const response = {
+                status: 'OK',
+                message: `Get customer's consultations success`,
+                pagination,
+                data: schedules.rows,
+                links: {
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/schedules` }
+                }
+            }
 
             return res.status(200).json(response);
         } catch (err) {
