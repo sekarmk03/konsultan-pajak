@@ -6,5 +6,6 @@ const role = require('./role');
 const schedule = require('./schedule');
 const consultation = require('./consultation');
 const notification = require('./notification');
+const consulttype = require('./consulttype');
 
-module.exports = { auth, user, customer, admin, role, schedule, consultation, notification };
+module.exports = { auth, user, customer, admin, role, schedule, consultation, notification, consulttype };
