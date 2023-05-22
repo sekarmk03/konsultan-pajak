@@ -1,4 +1,4 @@
-const { Customer, User, Schedule, Consultation, ConsultType } = require('../models');
+const { Customer, User, Schedule, Consultation, ConsultType, Image } = require('../models');
 const { Op } = require('sequelize');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
@@ -78,17 +78,43 @@ module.exports = {
 
     show: async (req, res, next) => {
         try {
-            const { id } = req.params;
-            const customer = await Customer.findOne({
-                where: {id},
-                include: [
-                    {
-                        model: User,
-                        as: 'user'
-                    }
-                ]
-            });
-
+            let customer;
+            if (req.user.role_id == 1 || req.user.role_id == 2) {
+                const { id } = req.params;
+                customer = await Customer.findOne({
+                    where: {id},
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                            include: {
+                                model: Image,
+                                as: 'image',
+                                attributes: ['file_name', 'imagekit_url']
+                            }
+                        }
+                    ]
+                });
+            } else {
+                const { id } = req.user;
+                customer = await Customer.findOne({
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                            where: {
+                                id: id
+                            },
+                            include: {
+                                model: Image,
+                                as: 'image',
+                                attributes: ['file_name', 'imagekit_url']
+                            }
+                        }
+                    ]
+                });
+            }
+            
             if (!customer) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
