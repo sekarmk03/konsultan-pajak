@@ -295,27 +295,4 @@ module.exports = {
         }
     },
 
-    readAll: async (req, res, next) => {
-        try {
-            const notification = await Notification.update({
-                is_read: true
-            }
-            );
-
-            const response = {
-                status: 'OK',
-                message: 'Read all notification success',
-                data: notification,
-                links: {
-                    self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/notifications` },
-                    readAll: { href: `${API_BASE_PATH}/notifications/read` }
-                }
-            };
-
-            return res.status(200).json(response);
-        } catch (err) {
-            next(err);
-        }
-    }
 }
