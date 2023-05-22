@@ -32,7 +32,7 @@ module.exports = {
                 ],
                 where: {
                     date: {
-                        [Op.gte]: [startTime]
+                        [Op.gte]: startTime
                     },
                 },
                 include: [
