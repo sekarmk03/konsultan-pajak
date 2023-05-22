@@ -131,7 +131,9 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { name, email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
+            let { name, email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
+            img_id = parseInt(img_id);
+            role_id = parseInt(role_id);
 
             const body = req.body;
             const val = v.validate(body, schema.user.create);
@@ -208,6 +210,7 @@ module.exports = {
         try {
             const { id } = req.params;
             let { email, role_id, img_id } = req.body;
+            role_id = parseInt(role_id);
 
             const body = req.body;
             const val = v.validate(body, schema.user.update);

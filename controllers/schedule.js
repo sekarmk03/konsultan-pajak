@@ -141,6 +141,8 @@ module.exports = {
     create: async (req, res, next) => {
         try {
             let { cust_id, type_id, date, place_type, address, gmap_link } = req.body;
+            type_id = parseInt(type_id);
+            cust_id = parseInt(cust_id);
 
             const dateOnly = date.substring(0, 10);
             const openTime = new Date(`${dateOnly}T${openHours.OPEN}`);
@@ -209,6 +211,7 @@ module.exports = {
         try {
             const { id } = req.params;
             let { type_id, date, place_type, address, gmap_link } = req.body;
+            type_id = parseInt(type_id);
 
             if (date) {
                 const dateOnly = date.substring(0, 10);

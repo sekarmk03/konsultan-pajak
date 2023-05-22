@@ -164,6 +164,9 @@ module.exports = {
     create: async (req, res, next) => {
         try {
             let { schedule_id, admin_id, cost = 0 } = req.body;
+            schedule_id = parseInt(schedule_id);
+            admin_id = parseInt(admin_id);
+            cost = parseInt(cost);
 
             const body = req.body;
             const val = v.validate(body, schema.consultation.create);
@@ -210,6 +213,8 @@ module.exports = {
         try {
             const { id } = req.params;
             let { admin_id, date_start, date_end, status, cost } = req.body;
+            admin_id = parseInt(admin_id);
+            cost = parseInt(cost);
 
             const body = req.body;
             const val = v.validate(body, schema.consultation.update);

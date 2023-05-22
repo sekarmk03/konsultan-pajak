@@ -116,7 +116,9 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { user_id, name, age, telp, gender } = req.body;
+            let { user_id, name, age, telp, gender } = req.body;
+            user_id = parseInt(user_id);
+            age = parseInt(age);
 
             const body = req.body;
             const val = v.validate(body, schema.admin.create);
@@ -159,6 +161,7 @@ module.exports = {
         try {
             const { id } = req.params;
             let { name, age, telp, gender } = req.body;
+            age = parseInt(age);
 
             const body = req.body;
             const val = v.validate(body, schema.admin.update);

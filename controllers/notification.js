@@ -125,7 +125,9 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { receiver_id, sender_id, topic, title, message } = req.body;
+            let { receiver_id, sender_id, topic, title, message } = req.body;
+            receiver_id = parseInt(receiver_id);
+            sender_id = parseInt(sender_id);
 
             const body = req.body;
             const val = v.validate(body, schema.notification.create);
@@ -170,6 +172,8 @@ module.exports = {
         try {
             const { id } = req.params;
             let { receiver_id, sender_id, topic, title, message, is_read } = req.body;
+            receiver_id = parseInt(receiver_id);
+            sender_id = parseInt(sender_id);
 
             const body = req.body;
             const val = v.validate(body, schema.notification.update);

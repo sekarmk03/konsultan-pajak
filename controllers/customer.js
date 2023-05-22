@@ -150,7 +150,8 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { user_id, name, npwp, address, leader_name, leader_title, pkp, business_type, acc_name, acc_telp } = req.body;
+            let { user_id, name, npwp, address, leader_name, leader_title, pkp, business_type, acc_name, acc_telp } = req.body;
+            user_id = parseInt(user_id);
 
             const body = req.body;
             const val = v.validate(body, schema.customer.create);
