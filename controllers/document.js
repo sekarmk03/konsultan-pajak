@@ -1,7 +1,8 @@
-const { Document, Notification, Consultation, Schedule } = require('../models');
+const { Document, Notification, Consultation, Schedule, Customer, User } = require('../models');
 const { Op } = require('sequelize');
 const halson = require('halson');
 const imagekit = require('../utils/imagekit');
+const mail = require('../utils/mailer');
 const {
     API_BASE_PATH,
     IMAGEKIT_FOLDER
@@ -125,7 +126,17 @@ module.exports = {
                 where: {id: consultation_id},
                 include: {
                     model: Schedule,
-                    as: 'schedule'
+                    as: 'schedule',
+                    include: {
+                        model: Customer,
+                        as: 'customer',
+                        attributes: ['name'],
+                        include: {
+                            model: User,
+                            as: 'user',
+                            attributes: ['email']
+                        }
+                    }
                 }
             });
 
@@ -136,6 +147,17 @@ module.exports = {
                 title: 'Your consultation result is ready!',
                 message: 'We have already sent your consultation result document to your email. You can also download it in the consultation detail page. Feel free to contact us if you have any questions.'
             });
+
+            const htmlEmail = await mail.getHtml('consultresult.ejs', { name: consultation.schedule.customer.name });
+
+            let attachments = [];
+            attachments.push({
+                fileName: created.file_name,
+                path: created.imagekit_url,
+                contentType: 'application/pdf'
+            });
+
+            await mail.sendMail(consultation.schedule.customer.user.email, 'Consultation Result!', htmlEmail, attachments);
 
             const docResource = halson(created.toJSON())
             .addLink('self', `${API_BASE_PATH}/documents/${created.id}`)

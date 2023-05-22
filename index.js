@@ -18,6 +18,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static('public'));
 
 // err handler
 app.use(API_BASE_PATH, router);
