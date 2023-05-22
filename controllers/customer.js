@@ -1,4 +1,4 @@
-const { Customer, User, Schedule, Consultation, ConsultType, Image } = require('../models');
+const { Customer, User, Schedule, Consultation, ConsultType, Image, Notification, Admin } = require('../models');
 const { Op } = require('sequelize');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
@@ -52,6 +52,7 @@ module.exports = {
                 const cRes = halson(cust.toJSON())
                 .addLink('self', `${API_BASE_PATH}/customers/${cust.id}`)
                 .addLink('user', `${API_BASE_PATH}/users/${cust.user_id}`)
+                .addLink('notification', `${API_BASE_PATH}/customers/${cust.id}/notifications`)
                 .addLink('consult-request', `${API_BASE_PATH}/customers/${cust.id}/requests`)
                 .addLink('consult-ongoing', `${API_BASE_PATH}/customers/${cust.id}/consultations?status=ongoing`)
                 .addLink('consult-done', `${API_BASE_PATH}/customers/${cust.id}/consultations?status=done`);
@@ -126,6 +127,7 @@ module.exports = {
             const custResource = halson(customer.toJSON())
             .addLink('self', `${API_BASE_PATH}/customers/${customer.id}`)
             .addLink('user', `${API_BASE_PATH}/users/${customer.user_id}`)
+            .addLink('notification', `${API_BASE_PATH}/customers/${customer.id}/notifications`)
             .addLink('consult-request', `${API_BASE_PATH}/customers/${customer.id}/requests`)
             .addLink('consult-ongoing', `${API_BASE_PATH}/customers/${customer.id}/consultations?status=ongoing`)
             .addLink('consult-done', `${API_BASE_PATH}/customers/${customer.id}/consultations?status=done`);
@@ -456,6 +458,57 @@ module.exports = {
                 links: {
                     self: { href: req.originalUrl },
                     collection: { href: `${API_BASE_PATH}/schedules` }
+                }
+            }
+
+            return res.status(200).json(response);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    notification: async (req, res, next) => {
+        try {
+            let {
+                sort = "createdAt", type = "DESC"
+            } = req.query;
+            const { id } = req.params;
+
+            const notifications = await Notification.findAll({
+                order: [
+                    [sort, type]
+                ],
+                include: [
+                    {
+                        model: Admin,
+                        as: 'sender',
+                        attributes: ['name']
+                    },
+                    {
+                        model: Customer,
+                        as: 'receiver',
+                        where: { id },
+                        attributes: ['name']
+                    }
+                ]
+            });
+
+            const notifResources = notifications.map((notification) => {
+                const resource = halson(notification.toJSON())
+                .addLink('self', `${API_BASE_PATH}/notifications/${notification.id}`)
+                .addLink('read', `${API_BASE_PATH}/notifications/${notification.id}/read`);
+
+                return resource;
+            });
+
+            const response = {
+                status: 'OK',
+                message: 'Get all notifications success',
+                data: notifResources,
+                links: {
+                    self: { href: req.originalUrl },
+                    collection: { href: `${API_BASE_PATH}/notifications` },
+                    readAll: { href: `${API_BASE_PATH}/notifications/read` }
                 }
             }
 

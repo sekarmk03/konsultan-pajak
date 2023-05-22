@@ -6,6 +6,7 @@ const roles = require('../common/constant/roles');
 
 router.get('/', authorize([roles.SUPERADMIN, roles.ADMIN]), c.customer.index);
 router.get('/:id', authorize(), c.customer.show);
+router.get('/:id/notifications', authorize(), c.customer.notification);
 router.get('/:id/requests', authorize(), c.customer.consultRequest);
 router.get('/:id/consultations', authorize(), c.customer.consultations);
 router.post('/', authorize(), c.customer.create);
