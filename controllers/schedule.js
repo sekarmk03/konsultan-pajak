@@ -173,6 +173,14 @@ module.exports = {
                 status: state.REQUESTED
             });
 
+            await Notification.create({
+                receiver_id: created.cust_id,
+                sender_id: 0,
+                topic: 'Consultation',
+                title: 'Your appointment successfully requested!',
+                message: 'Thank you for choosing our consulting services to help you. We will review your request within 3-5 working days.'
+            });
+
             const schResource = halson(created.toJSON())
             .addLink('self', `${API_BASE_PATH}/schedules/${created.id}`)
             .addLink('customer', `${API_BASE_PATH}/customers/${created.cust_id}`)
@@ -352,6 +360,14 @@ module.exports = {
                 cost
             });
 
+            await Notification.create({
+                receiver_id: schedule.cust_id,
+                sender_id: 0,
+                topic: 'Consultation',
+                title: 'Your consultation request has been accepted!',
+                message: 'Thank you for choosing our consulting services to help you. Our consulting will immediately contact you to make sure the schedule is well booked for you.'
+            });
+
             const schResource = halson(schedule.toJSON())
             .addLink('self', `${API_BASE_PATH}/schedules/${schedule.id}`)
             .addLink('customer', `${API_BASE_PATH}/customers/${schedule.cust_id}`)
@@ -410,6 +426,14 @@ module.exports = {
 
             await schedule.update({
                 status: state.DECLINED,
+            });
+
+            await Notification.create({
+                receiver_id: schedule.cust_id,
+                sender_id: 0,
+                topic: 'Consultation',
+                title: 'Your consultation request has been declined!',
+                message: `We're so sorry to say that your request could not be accepted due to several reasons. Please make another request next time. Thank you.`
             });
 
             const response = {

@@ -258,6 +258,14 @@ module.exports = {
                 acc_telp
             });
 
+            await Notification.create({
+                receiver_id: customer.id,
+                sender_id: 0,
+                topic: 'Account',
+                title: 'Your profile has been updated!',
+                message: 'Keep your profile always updated and dont forget to periodically reset your email.'
+            });
+
             const custResource = halson(customer.toJSON())
             .addLink('self', `${API_BASE_PATH}/customers/${customer.id}`)
             .addLink('user', `${API_BASE_PATH}/users/${customer.user_id}`);

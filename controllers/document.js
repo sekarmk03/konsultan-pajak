@@ -1,4 +1,4 @@
-const { Document } = require('../models');
+const { Document, Notification, Consultation, Schedule } = require('../models');
 const { Op } = require('sequelize');
 const halson = require('halson');
 const imagekit = require('../utils/imagekit');
@@ -119,6 +119,22 @@ module.exports = {
                 imagekit_id: uploadImg.fileId,
                 imagekit_url: uploadImg.url,
                 imagekit_path: uploadImg.filePath
+            });
+
+            const consultation = await Consultation.findOne({
+                where: {id: consultation_id},
+                include: {
+                    model: Schedule,
+                    as: 'schedule'
+                }
+            });
+
+            await Notification.create({
+                receiver_id: consultation.schedule.cust_id,
+                sender_id: consultation.admin_id,
+                topic: 'Consultation',
+                title: 'Your consultation result is ready!',
+                message: 'We have already sent your consultation result document to your email. You can also download it in the consultation detail page. Feel free to contact us if you have any questions.'
             });
 
             const docResource = halson(created.toJSON())

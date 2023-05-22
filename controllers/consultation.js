@@ -1,4 +1,4 @@
-const { Consultation, Schedule, Admin, Customer, ConsultType, Document } = require('../models');
+const { Consultation, Schedule, Admin, Customer, ConsultType, Document, Notification } = require('../models');
 const state = require('../common/constant/status');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
@@ -303,7 +303,13 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const consultation = await Consultation.findOne({where: {id}});
+            const consultation = await Consultation.findOne({
+                where: {id},
+                include: {
+                    model: Schedule,
+                    as: 'schedule'
+                }
+            });
             if (!consultation) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
@@ -337,6 +343,14 @@ module.exports = {
                 date_start: new Date()
             });
 
+            await Notification.create({
+                receiver_id: consultation.schedule.cust_id,
+                sender_id: consultation.admin_id,
+                topic: 'Consultation',
+                title: 'Your consultation has been started!',
+                message: 'Meet our consultant at the appointed time and place. Contact our company contact if you have questions or complaints.'
+            });
+
             const response = {
                 status: 'OK',
                 message: 'Start consultation success',
@@ -358,7 +372,14 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const consultation = await Consultation.findOne({where: {id}});
+            const consultation = await Consultation.findOne({
+                where: {id},
+                include: {
+                    model: Schedule,
+                    as: 'schedule'
+                }
+            });
+
             if (!consultation) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
@@ -390,6 +411,14 @@ module.exports = {
             await consultation.update({
                 status: state.DONE,
                 date_end: new Date()
+            });
+
+            await Notification.create({
+                receiver_id: consultation.schedule.cust_id,
+                sender_id: consultation.admin_id,
+                topic: 'Consultation',
+                title: 'Your consultation has been ended!',
+                message: 'Thank you for using our consulting services. You will soon be able to see the results of your consultation document on the consultation detail page and we will also send it via your registered email.'
             });
 
             const response = {
