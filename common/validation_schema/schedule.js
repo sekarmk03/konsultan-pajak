@@ -4,7 +4,7 @@ module.exports = {
         type_id: { type: 'number' },
         place_type: { type: 'string' },
         address: { type: 'string' },
-        gmap_link: { type: 'string' },
+        gmap_link: { optional: true, type: 'string' },
     },
     update: {
         type_id: { optional: true, type: 'number' },
