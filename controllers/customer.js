@@ -333,9 +333,9 @@ module.exports = {
             let start = 0 + (page - 1) * limit;
             let end = page * limit;
 
-            const now = new Date();
-            const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
-            const endTime = new Date(date ? date + ' 23:59:59' : now);
+            // const now = new Date();
+            // const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
+            // const endTime = new Date(date ? date + ' 23:59:59' : now);
 
             const schedules = await Schedule.findAndCountAll({
                 order: [
@@ -343,9 +343,9 @@ module.exports = {
                 ],
                 where: {
                     cust_id: id,
-                    date: {
-                        [Op.between]: [startTime, endTime]
-                    }
+                    // date: {
+                    //     [Op.between]: [startTime, endTime]
+                    // }
                 },
                 include: [
                     {
@@ -408,9 +408,9 @@ module.exports = {
             let start = 0 + (page - 1) * limit;
             let end = page * limit;
 
-            const now = new Date();
-            const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
-            const endTime = new Date(date ? date + ' 23:59:59' : now);
+            // const now = new Date();
+            // const startTime = new Date(`${date ? date : '2023-01-02'} 12:00:00`);
+            // const endTime = new Date(date ? date + ' 23:59:59' : now);
 
             const schedules = await Schedule.findAndCountAll({
                 order: [
@@ -418,9 +418,9 @@ module.exports = {
                 ],
                 where: {
                     cust_id: id,
-                    date: {
-                        [Op.between]: [startTime, endTime]
-                    },
+                    // date: {
+                    //     [Op.between]: [startTime, endTime]
+                    // },
                 },
                 include: [
                     {
