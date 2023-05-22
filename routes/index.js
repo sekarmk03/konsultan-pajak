@@ -11,6 +11,7 @@ const document = require('./document');
 const schedule = require('./schedule');
 const consultation = require('./consultation');
 const notification = require('./notification');
+const consulttype = require('./consulttype');
 
 router.use('/auth', auth);
 router.use('/users', user);
@@ -22,5 +23,6 @@ router.use('/documents', document);
 router.use('/schedules', schedule);
 router.use('/consultations', consultation);
 router.use('/notifications', notification);
+router.use('/consulttypes', consulttype);
 
 module.exports = router;

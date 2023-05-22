@@ -11,23 +11,22 @@ const {
 module.exports = {
     index: async (req, res, next) => {
         try {
-            const ctypes = await ConsultType.findAll();
+            const consulttypes = await ConsultType.findAll();
 
-            const typeResources = ctypes.map((ctype) => {
-                const resource = halson(ctype.toJSON())
-                .addLink('self', `${API_BASE_PATH}/ctypes/${ctype.id}`);
+            const typeResources = consulttypes.map((consulttype) => {
+                const resource = halson(consulttype.toJSON())
+                .addLink('self', `${API_BASE_PATH}/consulttypes/${consulttype.id}`);
 
                 return resource;
             });
 
             const response = {
                 status: 'OK',
-                message: 'Get all ctypes success',
-                pagination,
+                message: 'Get all consult types success',
                 data: typeResources,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/ctypes` }
+                    collection: { href: `${API_BASE_PATH}/consulttypes` }
                 }
             }
 
@@ -40,28 +39,28 @@ module.exports = {
     show: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const ctype = await ConsultType.findOne({
+            const consulttype = await ConsultType.findOne({
                 where: {id}
             });
 
-            if (!ctype) {
+            if (!consulttype) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `ConsultType didn't exist`,
+                    message: `Consult type didn't exist`,
                     data: null
                 });
             }
 
-            const roleResource = halson(ctype.toJSON())
-            .addLink('self', `${API_BASE_PATH}/ctypes/${ctype.id}`);
+            const roleResource = halson(consulttype.toJSON())
+            .addLink('self', `${API_BASE_PATH}/consulttypes/${consulttype.id}`);
 
             const response = {
                 status: 'OK',
-                message: 'Get ctype success',
+                message: 'Get consult type success',
                 data: roleResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/ctypes` }
+                    collection: { href: `${API_BASE_PATH}/consulttypes` }
                 }
             };
 
@@ -73,10 +72,10 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { name, desc } = req.body;
+            const { type, desc } = req.body;
 
             const body = req.body;
-            const val = v.validate(body, schema.ctype.create);
+            const val = v.validate(body, schema.consulttype.create);
             if (val.length) return res.status(400).json({
                 status: 'BAD_REQUEST',
                 message: val[0].message,
@@ -84,21 +83,21 @@ module.exports = {
             });
 
             const created = await ConsultType.create({
-                name,
+                type,
                 desc
             });
 
             const roleResource = halson(created.toJSON())
-            .addLink('self', `${API_BASE_PATH}/ctypes/${created.id}`);
+            .addLink('self', `${API_BASE_PATH}/consulttypes/${created.id}`);
 
             const response = {
                 status: 'CREATED',
-                message: 'New ctype created',
+                message: 'New consult type created',
                 data: roleResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/ctypes`},
-                    created: { href: `${API_BASE_PATH}/ctypes/${created.id}`}
+                    collection: { href: `${API_BASE_PATH}/consulttypes`},
+                    created: { href: `${API_BASE_PATH}/consulttypes/${created.id}`}
                 }
             };
 
@@ -111,44 +110,44 @@ module.exports = {
     update: async (req, res, next) => {
         try {
             const { id } = req.params;
-            let { name, desc } = req.body;
+            let { type, desc } = req.body;
 
             const body = req.body;
-            const val = v.validate(body, schema.ctype.update);
+            const val = v.validate(body, schema.consulttype.update);
             if (val.length) return res.status(400).json({
                 status: 'BAD_REQUEST',
                 message: val[0].message,
                 data: null
             });
 
-            const ctype = await ConsultType.findOne({where: {id}});
-            if (!ctype) {
+            const consulttype = await ConsultType.findOne({where: {id}});
+            if (!consulttype) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `ConsultType didn't exist`,
+                    message: `Consult type didn't exist`,
                     data: null
                 });
             }
 
-            if (!name) name = ctype.name;
-            if (!desc) desc = ctype.desc;
+            if (!type) type = consulttype.type;
+            if (!desc) desc = consulttype.desc;
 
-            await ctype.update({
-                name,
+            await consulttype.update({
+                type,
                 desc
             });
 
-            const roleResource = halson(ctype.toJSON())
-            .addLink('self', `${API_BASE_PATH}/ctypes/${ctype.id}`);
+            const roleResource = halson(consulttype.toJSON())
+            .addLink('self', `${API_BASE_PATH}/consulttypes/${consulttype.id}`);
 
             const response = {
                 status: 'OK',
-                message: 'Update ctype success',
+                message: 'Update consult type success',
                 data: roleResource,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/ctypes` },
-                    updated: { href: `${API_BASE_PATH}/ctypes/${ctype.id}` }
+                    collection: { href: `${API_BASE_PATH}/consulttypes` },
+                    updated: { href: `${API_BASE_PATH}/consulttypes/${consulttype.id}` }
                 }
             };
 
@@ -162,26 +161,26 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const ctype = await ConsultType.findOne({ where: {id} });
+            const consulttype = await ConsultType.findOne({ where: {id} });
 
-            if (!ctype) {
+            if (!consulttype) {
                 return res.status(404).json({
                     status: 'NOT_FOUND',
-                    message: `ConsultType didn't exist`,
+                    message: `Consult type didn't exist`,
                     data: null
                 });
             }
 
-            await ctype.destroy();
+            await consulttype.destroy();
 
             const response = {
                 status: 'OK',
-                message: 'Delete ctype success',
+                message: 'Delete consult type success',
                 data: null,
                 links: {
                     self: { href: req.originalUrl },
-                    collection: { href: `${API_BASE_PATH}/ctypes` },
-                    deleted: { href: `${API_BASE_PATH}/ctypes/${ctype.id}` }
+                    collection: { href: `${API_BASE_PATH}/consulttypes` },
+                    deleted: { href: `${API_BASE_PATH}/consulttypes/${consulttype.id}` }
                 }
             };
 

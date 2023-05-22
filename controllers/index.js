@@ -8,6 +8,7 @@ const document = require('./document');
 const schedule = require('./schedule');
 const consultation = require('./consultation');
 const notification = require('./notification');
+const consulttype = require('./consulttype');
 
 module.exports = {
     auth,
@@ -19,5 +20,6 @@ module.exports = {
     document,
     schedule,
     consultation,
-    notification
+    notification,
+    consulttype
 };

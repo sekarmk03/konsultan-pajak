@@ -11,38 +11,9 @@ const {
 module.exports = {
     index: async (req, res, next) => {
         try {
-            let {
-                sort = "name", type = "DESC", search = "", page = "1", limit = "10"
-            } = req.query;
+            const roles = await Role.findAll();
 
-            page = parseInt(page);
-            limit = parseInt(limit);
-            let start = 0 + (page - 1) * limit;
-            let end = page * limit;
-
-            const roles = await Role.findAndCountAll({
-                order: [
-                    [sort, type]
-                ],
-                where: {
-                    name: {
-                        [Op.iLike]: `%${search}%`
-                    }
-                },
-                limit: limit,
-                offset: start
-            });
-
-            let count = roles.count;
-            let pagination = {};
-            pagination.totalRows = count;
-            pagination.totalPages = Math.ceil(count/limit);
-            pagination.thisPageRows = roles.rows.length;
-            pagination.currentPage = page;
-            pagination.next = end < count ? page + 1 : null;
-            pagination.prev = start > 0 ? page - 1 : null;
-
-            const roleResources = roles.rows.map((role) => {
+            const roleResources = roles.map((role) => {
                 const resource = halson(role.toJSON())
                 .addLink('self', `${API_BASE_PATH}/roles/${role.id}`);
 
@@ -52,7 +23,6 @@ module.exports = {
             const response = {
                 status: 'OK',
                 message: 'Get all roles success',
-                pagination,
                 data: roleResources,
                 links: {
                     self: { href: req.originalUrl },
