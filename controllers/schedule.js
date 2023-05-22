@@ -143,6 +143,7 @@ module.exports = {
             let { cust_id, type_id, date, place_type, address, gmap_link } = req.body;
             type_id = parseInt(type_id);
             cust_id = parseInt(cust_id);
+            type_id = parseInt(type_id);
 
             const dateOnly = date.substring(0, 10);
             const openTime = new Date(`${dateOnly}T${openHours.OPEN}`);
