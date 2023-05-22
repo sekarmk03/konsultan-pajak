@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const roles = require('../common/constant/roles');
-const { User, Notification, Image } = require('../models');
+const { User, Notification, Customer, Image } = require('../models');
 const schema = require('../common/validation_schema');
 const Validator = require('fastest-validator');
 const v = new Validator;
@@ -13,7 +13,15 @@ const {
 module.exports = {
     register: async (req, res, next) => {
         try {
-            const { email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
+            const { name, email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
+
+            const body = req.body;
+            const val = v.validate(body, schema.auth.register);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const exist = await User.findOne({where: {email: email}});
 
@@ -25,10 +33,6 @@ module.exports = {
                 });
             }
 
-            const body = req.body;
-            const val = v.validate(body, schema.user.register);
-            if (val.length) return res.status(400).json(val);
-
             const hashedPass = await bcrypt.hash(password, 10);
             const newUser = await User.create({
                 email,
@@ -37,7 +41,7 @@ module.exports = {
                 img_id
             });
 
-            await Notification.create({
+            const notification = await Notification.create({
                 receiver_id: newUser.id,
                 sender_id: 0,
                 topic: 'account',
@@ -46,15 +50,31 @@ module.exports = {
                 is_read: false,
             });
 
+            const customer = await Customer.create({
+                user_id: newUser.id,
+                name,
+                npwp: '',
+                address: '',
+                leader_name: '',
+                leader_title: '',
+                pkp: '',
+                business_type: '',
+                acc_name: '',
+                acc_telp: ''
+            });
+
             return res.status(201).json({
                 status: 'CREATED',
                 message: 'User registered',
                 _links: {
                     login: `${API_BASE_PATH}/auth/login`,
-                    check_user: `${API_BASE_PATH}/auth/whoami`
+                    check_user: `${API_BASE_PATH}/auth/whoami`,
+                    customer: `${API_BASE_PATH}/customers/${customer.id}`,
+                    notification: `${API_BASE_PATH}/notifications/${notification.id}`
                 },
                 data: {
                     id: newUser.id,
+                    name: customer.name,
                     email: newUser.email,
                     password: newUser.password,
                     role_id: newUser.role_id,
@@ -69,6 +89,15 @@ module.exports = {
     login: async (req, res, next) => {
         try {
             const { email, password } = req.body;
+
+            const body = req.body;
+            const val = v.validate(body, schema.auth.login);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
+
             const user = await User.findOne({
                 where: {email: email},
                 include: {

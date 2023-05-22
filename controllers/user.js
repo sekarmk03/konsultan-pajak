@@ -1,4 +1,4 @@
-const { User, Role, Image } = require('../models');
+const { User, Role, Image, Admin, Customer } = require('../models');
 const { Op } = require('sequelize');
 const roles = require('../common/constant/roles');
 const schema = require('../common/validation_schema');
@@ -131,11 +131,15 @@ module.exports = {
 
     create: async (req, res, next) => {
         try {
-            const { email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
+            const { name, email, password, role_id = roles.CUSTOMER, img_id = 1 } = req.body;
 
             const body = req.body;
-            const val = v.validate(body, schema.user.register);
-            if (val.length) return res.status(400).json(val);
+            const val = v.validate(body, schema.user.create);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const user = await User.findOne({where: {email}});
 
@@ -153,6 +157,30 @@ module.exports = {
                 role_id,
                 img_id
             });
+
+            let detail;
+            if (role_id == 2) {
+                detail = await Admin.create({
+                    user_id: created.id,
+                    name,
+                    age: 0,
+                    telp: '',
+                    gender: ''
+                });
+            } else if (role_id == 3) {
+                detail = await Customer.create({
+                    user_id: created.id,
+                    name,
+                    npwp: '',
+                    address: '',
+                    leader_name: '',
+                    leader_title: '',
+                    pkp: '',
+                    business_type: '',
+                    acc_name: '',
+                    acc_telp: ''
+                });
+            }
 
             const userResource = halson(created.toJSON())
             .addLink('self', `${API_BASE_PATH}/users/${created.id}`)
@@ -183,7 +211,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.user.update);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const user = await User.findOne({ where: { id } });
             if (!user) {

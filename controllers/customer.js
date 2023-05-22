@@ -51,7 +51,8 @@ module.exports = {
             const custResources = customers.rows.map((cust) => {
                 const cRes = halson(cust.toJSON())
                 .addLink('self', `${API_BASE_PATH}/customers/${cust.id}`)
-                .addLink('user', `${API_BASE_PATH}/users/${cust.user_id}`);
+                .addLink('user', `${API_BASE_PATH}/users/${cust.user_id}`)
+                .addLink('consultation', `${API_BASE_PATH}/customers/${cust.id}/consultations`);
 
                 return cRes;
             });
@@ -96,7 +97,8 @@ module.exports = {
 
             const custResource = halson(customer.toJSON())
             .addLink('self', `${API_BASE_PATH}/customers/${customer.id}`)
-            .addLink('user', `${API_BASE_PATH}/users/${customer.user_id}`);
+            .addLink('user', `${API_BASE_PATH}/users/${customer.user_id}`)
+            .addLink('consultation', `${API_BASE_PATH}/customers/${customer.id}/consultations`);
 
             const response = {
                 status: 'OK',
