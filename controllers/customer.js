@@ -122,7 +122,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.customer.create);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const customer = await Customer.findOne({where: {npwp}});
 
@@ -175,7 +179,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.customer.update);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const customer = await Customer.findOne({where: {id}});
             if (!customer) {

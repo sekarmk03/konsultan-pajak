@@ -14,7 +14,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "date", type = "ASC", date = "", page = "1", limit = "10"
+                sort = "createdAt", type = "DESC", date = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);
