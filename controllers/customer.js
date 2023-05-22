@@ -12,7 +12,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "name", type = "ASC", search = "", page = "1", limit = "10"
+                sort = "name", type = "DESC", search = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);
@@ -334,7 +334,7 @@ module.exports = {
                     cust_id: id,
                     date: {
                         [Op.between]: [startTime, endTime]
-                    },
+                    }
                 },
                 include: [
                     {
@@ -361,11 +361,18 @@ module.exports = {
             pagination.next = end < count ? page + 1 : null;
             pagination.prev = start > 0 ? page - 1 : null;
 
+            const schResources = schedules.rows.map((sch) => {
+                const resource = halson(sch.toJSON())
+                .addLink('self', `${API_BASE_PATH}/schedules/${sch.id}`);
+
+                return resource;
+            });
+
             const response = {
                 status: 'OK',
                 message: `Get customer's consultation requests success`,
                 pagination,
-                data: schedules.rows,
+                data: schResources,
                 links: {
                     self: { href: req.originalUrl },
                     collection: { href: `${API_BASE_PATH}/schedules` }
@@ -434,11 +441,18 @@ module.exports = {
             pagination.next = end < count ? page + 1 : null;
             pagination.prev = start > 0 ? page - 1 : null;
 
+            const schResources = schedules.rows.map((sch) => {
+                const resource = halson(sch.toJSON())
+                .addLink('self', `${API_BASE_PATH}/schedules/${sch.id}`);
+
+                return resource;
+            });
+
             const response = {
                 status: 'OK',
                 message: `Get customer's consultations success`,
                 pagination,
-                data: schedules.rows,
+                data: schResources,
                 links: {
                     self: { href: req.originalUrl },
                     collection: { href: `${API_BASE_PATH}/schedules` }

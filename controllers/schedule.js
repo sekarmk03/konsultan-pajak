@@ -157,7 +157,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.create);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const created = await Schedule.create({
                 cust_id,
@@ -215,7 +219,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.schedule.update);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const schedule = await Schedule.findOne({where: {id}});
             if (!schedule) {

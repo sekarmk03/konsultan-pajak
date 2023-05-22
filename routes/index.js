@@ -10,6 +10,7 @@ const role = require('./role');
 const document = require('./document');
 const schedule = require('./schedule');
 const consultation = require('./consultation');
+const notification = require('./notification');
 
 router.use('/auth', auth);
 router.use('/users', user);
@@ -20,5 +21,6 @@ router.use('/roles', role);
 router.use('/documents', document);
 router.use('/schedules', schedule);
 router.use('/consultations', consultation);
+router.use('/notifications', notification);
 
 module.exports = router;

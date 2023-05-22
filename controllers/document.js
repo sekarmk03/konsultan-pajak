@@ -11,7 +11,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "file_name", type = "ASC", search = "", page = "1", limit = "10"
+                sort = "file_name", type = "DESC", search = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);

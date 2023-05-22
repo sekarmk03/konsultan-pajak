@@ -12,7 +12,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "name", type = "ASC", search = "", page = "1", limit = "10"
+                sort = "name", type = "DESC", search = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);
@@ -106,7 +106,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.role.create);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const created = await Role.create({
                 name,
@@ -140,7 +144,11 @@ module.exports = {
 
             const body = req.body;
             const val = v.validate(body, schema.role.update);
-            if (val.length) return res.status(400).json(val);
+            if (val.length) return res.status(400).json({
+                status: 'BAD_REQUEST',
+                message: val[0].message,
+                data: null
+            });
 
             const role = await Role.findOne({where: {id}});
             if (!role) {

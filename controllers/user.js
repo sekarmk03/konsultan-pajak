@@ -13,7 +13,7 @@ module.exports = {
     index: async (req, res, next) => {
         try {
             let {
-                sort = "email", type = "ASC", search = "", page = "1", limit = "10"
+                sort = "email", type = "DESC", search = "", page = "1", limit = "10"
             } = req.query;
 
             page = parseInt(page);
