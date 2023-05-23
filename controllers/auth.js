@@ -146,7 +146,8 @@ module.exports = {
                     id: user.id,
                     email: user.email,
                     token: token,
-                    image: user.image
+                    image: user.image,
+                    role_id: user.role_id
                 }
             });
         } catch (err) {

@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.belongsTo(models.Role, {foreignKey: 'role_id', as: 'role'});
-      User.hasOne(models.Admin, {foreignKey: 'user_id', as: 'cust_detail'});
-      User.hasOne(models.Customer, {foreignKey: 'user_id', as: 'adm_detail'});
+      User.hasOne(models.Admin, {foreignKey: 'user_id', as: 'admin'});
+      User.hasOne(models.Customer, {foreignKey: 'user_id', as: 'customer'});
       User.belongsTo(models.Image, {foreignKey: 'img_id', as: 'image'});
     }
   }

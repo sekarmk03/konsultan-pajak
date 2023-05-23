@@ -40,6 +40,14 @@ module.exports = {
                         model: Image,
                         as: 'image',
                         attributes: ['file_name', 'imagekit_url']
+                    },
+                    {
+                        model: Admin,
+                        as: 'admin'
+                    },
+                    {
+                        model: Customer,
+                        as: 'customer'
                     }
                 ],
                 limit: limit,
@@ -96,6 +104,14 @@ module.exports = {
                         model: Image,
                         as: 'image',
                         attributes: ['file_name', 'imagekit_url']
+                    },
+                    {
+                        model: Admin,
+                        as: 'admin'
+                    },
+                    {
+                        model: Customer,
+                        as: 'customer'
                     }
                 ]
             });
