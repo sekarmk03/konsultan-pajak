@@ -9,6 +9,7 @@ const schedule = require('./schedule');
 const consultation = require('./consultation');
 const notification = require('./notification');
 const consulttype = require('./consulttype');
+const summary = require('./summary');
 
 module.exports = {
     auth,
@@ -21,5 +22,6 @@ module.exports = {
     schedule,
     consultation,
     notification,
-    consulttype
+    consulttype,
+    summary
 };
