@@ -343,6 +343,9 @@ module.exports = {
                 ],
                 where: {
                     cust_id: id,
+                    status: {
+                        [Op.in]: ['Requested', 'Accepted', 'Declined'],
+                    }
                     // date: {
                     //     [Op.between]: [startTime, endTime]
                     // }
@@ -356,7 +359,7 @@ module.exports = {
                     {
                         model: Consultation,
                         as: 'consultation',
-                        attributes: ['date_start', 'date_end', 'cost']
+                        attributes: ['id', 'status', 'date_start', 'date_end', 'cost']
                     }
                 ],
                 limit: limit,
@@ -402,6 +405,12 @@ module.exports = {
                 sort = "createdAt", type = "DESC", date = "", page = "1", limit = "10", status = 'ongoing'
             } = req.query;
             const { id } = req.params;
+            let statuses = [];
+            if (status == 'ongoing') {
+                statuses.push('Not Started', 'Ongoing');
+            } else {
+                statuses.push('Done');
+            }
 
             page = parseInt(page);
             limit = parseInt(limit);
@@ -433,10 +442,11 @@ module.exports = {
                         as: 'consultation',
                         where: {
                             status: {
-                                [Op.iLike]: `%${status}%`
+                                // [Op.iLike]: `%${status}%`
+                                [Op.in]: statuses
                             }
                         },
-                        attributes: ['id', 'date_start', 'date_end', 'cost']
+                        attributes: ['id', 'status', 'date_start', 'date_end', 'cost']
                     }
                 ],
                 limit: limit,
